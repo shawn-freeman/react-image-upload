@@ -29,5 +29,25 @@ namespace core_api.Controllers
             })
             .ToArray();
         }
+
+        [HttpPost(Name = "UploadImage")]
+        public async Task<IActionResult> Post([FromForm] IFormFileCollection formFiles)
+        {
+            try
+            {
+                if (formFiles == null || formFiles.Count() == 0) return BadRequest("Form Files parameter empty.");
+                if (HttpContext.Request.Form.Files.Any()) return BadRequest("HttpContext form files empty.");
+
+                foreach (var file in formFiles)
+                {
+
+                }
+
+                return Ok();
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
