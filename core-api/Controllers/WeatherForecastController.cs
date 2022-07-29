@@ -35,15 +35,14 @@ namespace core_api.Controllers
         {
             try
             {
-                var base64 = fileModel.Base64Image.Split(',').Last();
-                byte[] bytes = Convert.FromBase64String(base64);
-                string filedir = Path.Combine(Directory.GetCurrentDirectory(), "NewFolder");
+                byte[] bytes = Convert.FromBase64String(fileModel.Base64Image);
+                string filedir = Path.Combine(Directory.GetCurrentDirectory(), "UploadedImages");
                 if (!Directory.Exists(filedir))
                 { //check if the folder exists;
                     Directory.CreateDirectory(filedir);
                 }
 
-                string file = Path.Combine(filedir, "a.jpg");
+                string file = Path.Combine(filedir, $"imageUpload.{fileModel.Type.Split('/').Last()}");
                 if (bytes.Length > 0)
                 {
                     using (var stream = new FileStream(file, FileMode.Create))

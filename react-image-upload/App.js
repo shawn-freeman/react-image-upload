@@ -2,8 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View, Dimensions, Image, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import RNFS from 'react-native-fs';
+//import RNFS from 'react-native-fs';
 import imgA from './img/A.png';
+import { HttpHandler } from './httpHandler';
 
 export default class App extends React.Component {
   state = {
@@ -11,21 +12,34 @@ export default class App extends React.Component {
   };
 
   handleChoosePhoto = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    let imageResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
+      console.log(imageResult.uri);
       
+      //Base64 datasource format
       //data:image/png;base64
-      let base64Image = await RNFS.readFile(result.uri, 'base64');
-      let extension = result.uri.split('.').pop();
-      let uri = `data:image/${extension};base64,${base64Image}`;
+      //let base64Image = await RNFS.readFile(result.uri, 'base64');
+      //let uri = `data:image/${extension};base64,${base64Image}`;
+
+      let splitDataSource = imageResult.uri.split(';');console.log(splitDataSource);
+      let type = splitDataSource[0].split(':').pop();
+      let base64 = splitDataSource[splitDataSource.length-1].split(',').pop();
       
-      if (!result.cancelled) {
-        this.setState({ displayImage: { uri: uri }  });
+      if (!imageResult.cancelled) {
+        this.setState({ displayImage: { uri: imageResult.uri }  });
       }
+
+      let data = {
+        name: 'uploadFileName',
+        type: type,
+        base64Image: base64
+      }
+      console.log(data);
+      await new HttpHandler().PostRequest('WeatherForecast', data);
 };
 
   render(){
