@@ -31,16 +31,26 @@ namespace core_api.Controllers
         }
 
         [HttpPost(Name = "UploadImage")]
-        public async Task<IActionResult> Post([FromForm] IFormFileCollection formFiles)
+        public async Task<IActionResult> Post([FromBody] FileModel fileModel)
         {
             try
             {
-                if (formFiles == null || formFiles.Count() == 0) return BadRequest("Form Files parameter empty.");
-                if (HttpContext.Request.Form.Files.Any()) return BadRequest("HttpContext form files empty.");
+                var base64 = fileModel.Base64Image.Split(',').Last();
+                byte[] bytes = Convert.FromBase64String(base64);
+                string filedir = Path.Combine(Directory.GetCurrentDirectory(), "NewFolder");
+                if (!Directory.Exists(filedir))
+                { //check if the folder exists;
+                    Directory.CreateDirectory(filedir);
+                }
 
-                foreach (var file in formFiles)
+                string file = Path.Combine(filedir, "a.jpg");
+                if (bytes.Length > 0)
                 {
-
+                    using (var stream = new FileStream(file, FileMode.Create))
+                    {
+                        stream.Write(bytes, 0, bytes.Length);
+                        stream.Flush();
+                    }
                 }
 
                 return Ok();
